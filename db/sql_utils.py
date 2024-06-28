@@ -58,7 +58,8 @@ def createTable():
                                 jobValidStatus TEXT NOT NULL,           --职位有效状态
                                 brandName TEXT NOT NULL,                --公司品牌名称
                                 brandScaleName TEXT NOT NULL,           --公司规模人数
-                                brandIndustry TEXT NOT NULL            --公司所在行业
+                                brandIndustry TEXT NOT NULL,            --公司所在行业
+                                createTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP --创建时间
                                 );"""
         excute_sql(sql)
 
