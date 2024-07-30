@@ -1,6 +1,7 @@
 import requests
 import time
 import json
+import random
 from db.sql_utils import createTable,insert_list_data
 from loguru import logger
 
@@ -34,8 +35,8 @@ def job_josn(cookies,query,city,page,pageSize):
 
 # 起始
 if __name__ == "__main__":
-    # 休眠10s后运行，防止频繁调用
-    time.sleep(3)
+    # 随机休眠10s后运行，防止频繁调用
+    time.sleep(random.randrange(10,20))
     # 创建表（若表存在，无动作）
     createTable()
 
@@ -43,11 +44,9 @@ if __name__ == "__main__":
     cookies = {
         '__zp_stoken__': 'f218fNz3Dk8K6wr3CtDAvAwsPAAwxLzA9KBs3NykwPTM3PT4%2FMTc9Nh0%2FJ8KAwr7CjE7CslDDiSM4Ij0%2BMjg3Mz49NRI9MsS7wr82PCXClcK4woZLwrtQw48Ew67CuV8VBH3Cvg4hwrcOwo7Cui0lGMK%2BOj84OgHCvsK%2Fwrkywr3CusK2OMK%2BwrnCsz8wOjkgO1UDDF87MElIXw1CVUlVV04IQENGIjoyPDjDqcKxJD8LBA4NDgYJAwADAQ4EenkJBgwPDA8ACgkKIDfCkMK5wp%2FDkMOvwozDtcScwp5Qwo%2FCnsKowqfCrcKhwqFOwrVPw79AwrdKS13CslvCucKrwp%2FCs8Kad0FJwrhbZX5lT2tUwr9%2BZ8K%2FeWvCvAYAAwkOUT4Hw4sSw4o%3D',
     }
-
-
     # 搜索内容
     query = "java"
-    # 目标城市
+    # 目标城市 101280100是广州
     city = "101280100"
 
     # 初始页码，初始循环条件
