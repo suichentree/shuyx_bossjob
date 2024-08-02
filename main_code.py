@@ -1,3 +1,5 @@
+import sys
+
 import requests
 import time
 import json
@@ -28,40 +30,40 @@ def job_josn(cookies,query,city,page,pageSize):
         'page': page,
         'pageSize': pageSize,
     }
-    logger.info(f"开始调用joblist.json接口,请求params = {params}, cookies = {cookies}")
+    logger.info(f"开始调用joblist.json接口,请求params = {params} ")
     response = requests.get('https://www.zhipin.com/wapi/zpgeek/search/joblist.json', params=params, cookies=cookies,headers=headers).text
     response_dict_info = json.loads(response)
     return response_dict_info
 
 # 起始
 if __name__ == "__main__":
-    # 随机休眠10s后运行，防止频繁调用
-    time.sleep(random.randrange(10,20))
     # 创建表（若表存在，无动作）
     createTable()
 
     # cookies
     cookies = {
-        '__zp_stoken__': 'f218fNz3Dk8K6wr3CtDAvAwsPAAwxLzA9KBs3NykwPTM3PT4%2FMTc9Nh0%2FJ8KAwr7CjE7CslDDiSM4Ij0%2BMjg3Mz49NRI9MsS7wr82PCXClcK4woZLwrtQw48Ew67CuV8VBH3Cvg4hwrcOwo7Cui0lGMK%2BOj84OgHCvsK%2Fwrkywr3CusK2OMK%2BwrnCsz8wOjkgO1UDDF87MElIXw1CVUlVV04IQENGIjoyPDjDqcKxJD8LBA4NDgYJAwADAQ4EenkJBgwPDA8ACgkKIDfCkMK5wp%2FDkMOvwozDtcScwp5Qwo%2FCnsKowqfCrcKhwqFOwrVPw79AwrdKS13CslvCucKrwp%2FCs8Kad0FJwrhbZX5lT2tUwr9%2BZ8K%2FeWvCvAYAAwkOUT4Hw4sSw4o%3D',
-    }
+        '__zp_stoken__': '013dfw413BgUzBA8aVQXCv1jCvWdiwq5uUUNqwrBDwrBpTcKewr7CvMOMwqxoWGZNasOMwrfCgsKxwo1Ww77CpMKiXsKVwqPDtcKlwpHCp8KvwrjCnsSRxIrDksWuxLZGwr7CkDI8AQQOAQMYBRsYBhgFBA8NHBkHHBoBBA4BAzQ5wqXCrDQxNzQtRlhFAllVak5VTQ9UTUE%2FMQMbXlUxJT40Pz3DiMK%2BwrA3wrbCv8KyTMOIwr3CswY0Nz0%2FwrMSJC%2FCssSJI8Kyw54gJiDCsiUDwr7DiwPDjVXCrMOfw69%2FPDQ%2Bwr%2FEvjYzEjU0MjU9MjUyMyIyAsOPaMKWw5TDrcKKIzQSTDIzNjQ0MjNIMjYuMzVMLjI%2BJDYCBAYNGiM1wrLCs8K%2Fw5cyMw%3D%3D; __c=1722474195'    }
     # 搜索内容
     query = "java"
     # 目标城市 101280100是广州
     city = "101280100"
 
     # 初始页码，初始循环条件
-    page = 1
+    page = 9
     isContinue = True
     while isContinue:
-        # 调用接口前，休眠5秒
-        time.sleep(5)
+        # 随机休眠10-20秒后运行，防止频繁调用
+        sleep_time = random.randrange(10, 20)
+        logger.info(f"休眠 {sleep_time} 秒")
+        time.sleep(sleep_time)
         # 调用joblist.json接口，获取职位信息
         job_info = job_josn(cookies,query,city,page,30)
         # 是否有更多职位数据
         hasMore = False
+
         if job_info['code'] != 0:
             logger.error(f"调用joblist.json接口失败。job_info = {job_info}")
-            break
+            sys.exit()
         else:
             logger.success(f"调用joblist.json接口成功。job_info = {job_info}")
             hasMore = job_info["zpData"]["hasMore"]
