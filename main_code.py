@@ -1,16 +1,20 @@
 import sys
-
 import requests
-import time
 import json
-import random
-from db.sql_utils import createTable,insert_list_data
 from loguru import logger
 
-def job_josn(cookies,query,city,page,pageSize):
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0',
-    }
+def getSession():
+    mySession = requests.Session()
+    mySession.headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0'}
+    return requests.Session()
+
+def toStart(mySession):
+    # 访问首页
+    mySession.get("https://www.zhipin.com/guangzhou/?seoRefer=index")
+    # 打印mySession中的cookie值
+    print(requests.utils.dict_from_cookiejar(mySession.cookies))
+
+def job_josn(mySession,query,city,page):
     params = {
         'scene': '1',
         'query': query,
@@ -28,28 +32,38 @@ def job_josn(cookies,query,city,page,pageSize):
         'multiBusinessDistrict': '',
         'multiSubway': '',
         'page': page,
-        'pageSize': pageSize,
+        'pageSize': 30,
     }
-    logger.info(f"开始调用joblist.json接口,请求params = {params} ")
-    response = requests.get('https://www.zhipin.com/wapi/zpgeek/search/joblist.json', params=params, cookies=cookies,headers=headers).text
-    response_dict_info = json.loads(response)
+    logger.info(f"开始调用joblist.json接口,查询内容：{query},查询城市：{city}，页码：{page}")
+    response = mySession.get('https://www.zhipin.com/wapi/zpgeek/search/joblist.json', params=params)
+    response_dict_info = json.loads(response.text)
+    # 打印mySession中的cookie值
+    print(requests.utils.dict_from_cookiejar(mySession.cookies))
     return response_dict_info
+
 
 # 起始
 if __name__ == "__main__":
-    # 创建表（若表存在，无动作）
-    createTable()
+    # 获取会话session
+    mySession = getSession()
+    # 请求boss直聘首页
+    toStart(mySession)
 
-    # cookies
-    cookies = {
-        '__zp_stoken__': '013dfw413BgUzBA8aVQXCv1jCvWdiwq5uUUNqwrBDwrBpTcKewr7CvMOMwqxoWGZNasOMwrfCgsKxwo1Ww77CpMKiXsKVwqPDtcKlwpHCp8KvwrjCnsSRxIrDksWuxLZGwr7CkDI8AQQOAQMYBRsYBhgFBA8NHBkHHBoBBA4BAzQ5wqXCrDQxNzQtRlhFAllVak5VTQ9UTUE%2FMQMbXlUxJT40Pz3DiMK%2BwrA3wrbCv8KyTMOIwr3CswY0Nz0%2FwrMSJC%2FCssSJI8Kyw54gJiDCsiUDwr7DiwPDjVXCrMOfw69%2FPDQ%2Bwr%2FEvjYzEjU0MjU9MjUyMyIyAsOPaMKWw5TDrcKKIzQSTDIzNjQ0MjNIMjYuMzVMLjI%2BJDYCBAYNGiM1wrLCs8K%2Fw5cyMw%3D%3D; __c=1722474195'    }
+    # 搜索请求
     # 搜索内容
-    query = "java"
+    query = "爬虫"
     # 目标城市 101280100是广州
     city = "101280100"
 
+    # 调用joblist.json接口，获取职位信息
+    job_info = job_josn(mySession,query,city,1)
+    print(job_info)
+    # 程序结束运行
+    sys.exit()
+
+
     # 初始页码，初始循环条件
-    page = 9
+    page = 1
     isContinue = True
     while isContinue:
         # 随机休眠10-20秒后运行，防止频繁调用
@@ -57,7 +71,7 @@ if __name__ == "__main__":
         logger.info(f"休眠 {sleep_time} 秒")
         time.sleep(sleep_time)
         # 调用joblist.json接口，获取职位信息
-        job_info = job_josn(cookies,query,city,page,30)
+        job_info = job_josn(query,city,page,30)
         # 是否有更多职位数据
         hasMore = False
 

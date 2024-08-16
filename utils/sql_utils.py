@@ -2,6 +2,7 @@
 import sqlite3
 import os
 
+
 # 将查询结果从元组转换为字典
 def dict_factory(cursor, row):
     d = {}
